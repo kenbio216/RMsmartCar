@@ -186,4 +186,7 @@ E:\win_code_git\alist_ACTIVITY\RMsmartCar\build\sketch\main.ino.cpp.o: \
  C:\Users\xuyang\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.16\libraries\WebServer\src/HTTP_Method.h \
  C:\Users\xuyang\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.16/tools/sdk/esp32c3/include/nghttp/port/include/http_parser.h \
  C:\Users\xuyang\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.16\libraries\WebServer\src/Uri.h \
- C:\Users\xuyang\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.16\libraries\WebServer\src/detail/RequestHandler.h
+ C:\Users\xuyang\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.16\libraries\WebServer\src/detail/RequestHandler.h \
+ C:\Users\xuyang\Documents\Arduino\libraries\ESP32Servo\src/ESP32Servo.h \
+ C:\Users\xuyang\Documents\Arduino\libraries\ESP32Servo\src/ESP32PWM.h \
+ C:\Users\xuyang\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.16\cores\esp32/esp32-hal-ledc.h

@@ -2,20 +2,34 @@
 #line 1 "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\main\\main.ino"
 #include <WiFi.h>
 #include <WebServer.h>
-
+#include <ESP32Servo.h>
+/* -------------------------------------------------------------------------- */
+/*                                    基本定义                                    */
+/* -------------------------------------------------------------------------- */
 const char *ssid = "ESP32-Access-Point";
 const char *password = "123456789";
 
 WebServer server(80); // HTTP服务器在端口80
 
-const int ledPin = 12; // 根据你的ESP32板子的LED引脚可能有所不同
-const int servoPin = 8; // 舵机连接的引脚
+Servo servo1;
+Servo servo2;
+/* ---------------------------------- 引脚定义 ---------------------------------- */
+const int ledPin = 12;   // 根据你的ESP32板子的LED引脚可能有所不同
+const int servoPin1 = 8; // 舵机1连接的引脚
+const int servoPin2 = 4; // 舵机2连接的引脚
 
-int pwmChannel = 4;
-int pwmFreq = 50;  // 50 Hz for servo
-int pwmResolution = 8;  // 8-bit resolution
+const int motor1Pin1 = 2;  // 电机1的引脚1
+const int motor1Pin2 = 3;  // 电机1的引脚2
+const int motor2Pin1 = 10; // 电机2的引脚1
+const int motor2Pin2 = 6;  // 电机2的引脚2
 
-// HTML页面内容，包含控制LED的按钮和显示区域
+/* ---------------------------------- 数值初始化 --------------------------------- */
+int angle1 = 90; // 舵机1的初始角度
+int angle2 = 90; // 舵机2的初始角度
+
+/* -------------------------------------------------------------------------- */
+/*                          HTML页面内容，包含控制LED的按钮和显示区域                          */
+/* -------------------------------------------------------------------------- */
 const char *htmlPage = R"(
 <!DOCTYPE html>
 <html>
@@ -58,21 +72,23 @@ const char *htmlPage = R"(
   <div class="container">
     <h2>ESP32 Control Panel</h2>
     <div>
+      <h3>Motion Control</h3>
       <a class="button" href="/forward">Forward</a>
       <a class="button" href="/backward">Backward</a>
       <a class="button" href="/left">Left</a>
       <a class="button" href="/right">Right</a>
     </div>
     <div>
-      <a class="button" href="/led/on">Turn On LED</a>
-      <a class="button" href="/led/off">Turn Off LED</a>
-      <a class="button" href="/full_forward">Full Speed Forward</a>
-      <a class="button" href="/full_backward">Full Speed Backward</a>
+      <h3>Servo Control</h3>
+      <a class="button" href="/servo1/increase">Servo_one +10 </a>
+      <a class="button" href="/servo1/decrease">Servo_one -10 </a>
+      <a class="button" href="/servo2/increase">Servo_two +10 </a>
+      <a class="button" href="/servo2/decrease">Servo_two -10 </a>
     </div>
     <div>
-      <a class="button" href="/servo/0">Servo 0°</a>
-      <a class="button" href="/servo/90">Servo 90°</a>
-      <a class="button" href="/servo/180">Servo 180°</a>
+      <h3>Special Functions</h3>
+      <a class="button" href="/led/on">Turn On LED</a>
+      <a class="button" href="/led/off">Turn Off LED</a>
     </div>
     <div id="status">Status: Ready</div>
   </div>
@@ -95,90 +111,77 @@ const char *htmlPage = R"(
 )";
 
 // 前进的函数
-#line 96 "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\main\\main.ino"
-void forward();
-#line 103 "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\main\\main.ino"
-void backward();
-#line 110 "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\main\\main.ino"
-void left();
-#line 116 "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\main\\main.ino"
-void right();
-#line 122 "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\main\\main.ino"
-void fullForward();
-#line 129 "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\main\\main.ino"
-void fullBackward();
-#line 136 "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\main\\main.ino"
-void setServoAngle(int angle);
-#line 143 "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\main\\main.ino"
-void encoder();
-#line 149 "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\main\\main.ino"
-void setup();
-#line 234 "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\main\\main.ino"
-void loop();
-#line 96 "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\main\\main.ino"
 void forward()
 {
-    digitalWrite(2, HIGH);
-    digitalWrite(3, LOW);
+    digitalWrite(motor1Pin1, HIGH);
+    digitalWrite(motor1Pin2, LOW);
+    digitalWrite(motor2Pin1, HIGH);
+    digitalWrite(motor2Pin2, LOW);
 }
 
 // 后退的函数
 void backward()
 {
-    digitalWrite(2, LOW);
-    digitalWrite(3, HIGH);
+    digitalWrite(motor1Pin1, LOW);
+    digitalWrite(motor1Pin2, HIGH);
+    digitalWrite(motor2Pin1, LOW);
+    digitalWrite(motor2Pin2, HIGH);
 }
 
 // 向左的函数
 void left()
 {
     // 这里根据实际需要添加控制代码
+    digitalWrite(motor1Pin1, LOW);
+    digitalWrite(motor1Pin2, HIGH);
+    digitalWrite(motor2Pin1, LOW);
+    digitalWrite(motor2Pin2, LOW);
 }
 
 // 向右的函数
 void right()
 {
     // 这里根据实际需要添加控制代码
+    digitalWrite(motor1Pin1, HIGH);
+    digitalWrite(motor1Pin2, LOW);
+    digitalWrite(motor2Pin1, LOW);
+    digitalWrite(motor2Pin2, LOW);
 }
 
-// 全速前进的函数
-void fullForward()
+// 舵机1增加角度
+void increaseServo1Angle()
 {
-    analogWrite(2, 255);
-    analogWrite(3, 0);
+    angle1 = min(angle1 + 10, 180);
+    servo1.write(angle1);
 }
 
-// 全速后退的函数
-void fullBackward()
+// 舵机1减少角度
+void decreaseServo1Angle()
 {
-    analogWrite(2, 0);
-    analogWrite(3, 255);
+    angle1 = max(angle1 - 10, 0);
+    servo1.write(angle1);
 }
 
-// 舵机控制函数
-void setServoAngle(int angle)
+// 舵机2增加角度
+void increaseServo2Angle()
 {
-    int dutyCycle = map(angle, 0, 180, 26, 128);  // 将角度映射到舵机的PWM占空比范围
-    ledcWrite(pwmChannel, dutyCycle);
+    angle2 = min(angle2 + 10, 180);
+    servo2.write(angle2);
 }
 
-//接收10号引脚的编码器数据，并且在串口上打印它
-void encoder()
+// 舵机2减少角度
+void decreaseServo2Angle()
 {
-    int encoderValue = digitalRead(10);
-    Serial.println(encoderValue);
+    angle2 = max(angle2 - 10, 0);
+    servo2.write(angle2);
 }
 
 void setup()
 {
-    // 编码器部分
-    pinMode(10, INPUT);
-    // 轮子部分
-    pinMode(2, OUTPUT);
-    pinMode(3, OUTPUT);
     // 舵机部分
-    ledcSetup(pwmChannel, pwmFreq, pwmResolution); // 设置PWM通道
-    ledcAttachPin(servoPin, pwmChannel);           // 将PWM通道附加到指定引脚
+    servo1.attach(servoPin1);
+    servo2.attach(servoPin2);
+
     // wifi部分
     pinMode(ledPin, OUTPUT);   // 设置LED引脚为输出模式
     digitalWrite(ledPin, LOW); // 默认关闭LED
@@ -191,64 +194,58 @@ void setup()
     Serial.println(WiFi.softAPIP());
 
     // 定义URL路由和对应的处理函数
-    server.on("/", HTTP_GET, []() {
-        server.send(200, "text/html", htmlPage);
-    });
+    server.on("/", HTTP_GET, []()
+              { server.send(200, "text/html", htmlPage); });
 
-    server.on("/led/on", HTTP_GET, []() {
+    server.on("/led/on", HTTP_GET, []()
+              {
         digitalWrite(ledPin, HIGH);
-        server.send(200, "text/html", "LED is ON");
-    });
+        server.send(200, "text/html", "LED is ON"); });
 
-    server.on("/led/off", HTTP_GET, []() {
+    server.on("/led/off", HTTP_GET, []()
+              {
         digitalWrite(ledPin, LOW);
-        server.send(200, "text/html", "LED is OFF");
-    });
+        server.send(200, "text/html", "LED is OFF"); });
 
-    server.on("/forward", HTTP_GET, []() {
+    server.on("/forward", HTTP_GET, []()
+              {
         forward();
-        server.send(200, "text/html", "Moving Forward");
-    });
+        server.send(200, "text/html", "Moving Forward"); });
 
-    server.on("/backward", HTTP_GET, []() {
+    server.on("/backward", HTTP_GET, []()
+              {
         backward();
-        server.send(200, "text/html", "Moving Backward");
-    });
+        server.send(200, "text/html", "Moving Backward"); });
 
-    server.on("/left", HTTP_GET, []() {
+    server.on("/left", HTTP_GET, []()
+              {
         left();
-        server.send(200, "text/html", "Turning Left");
-    });
+        server.send(200, "text/html", "Turning Left"); });
 
-    server.on("/right", HTTP_GET, []() {
+    server.on("/right", HTTP_GET, []()
+              {
         right();
-        server.send(200, "text/html", "Turning Right");
-    });
+        server.send(200, "text/html", "Turning Right"); });
 
-    server.on("/full_forward", HTTP_GET, []() {
-        fullForward();
-        server.send(200, "text/html", "Full Speed Forward");
-    });
+    server.on("/servo1/increase", HTTP_GET, []()
+              {
+        increaseServo1Angle();
+        server.send(200, "text/html", "Servo 1 Angle: " + String(angle1)); });
 
-    server.on("/full_backward", HTTP_GET, []() {
-        fullBackward();
-        server.send(200, "text/html", "Full Speed Backward");
-    });
+    server.on("/servo1/decrease", HTTP_GET, []()
+              {
+        decreaseServo1Angle();
+        server.send(200, "text/html", "Servo 1 Angle: " + String(angle1)); });
 
-    server.on("/servo/0", HTTP_GET, []() {
-        setServoAngle(0);
-        server.send(200, "text/html", "Servo at 0°");
-    });
+    server.on("/servo2/increase", HTTP_GET, []()
+              {
+        increaseServo2Angle();
+        server.send(200, "text/html", "Servo 2 Angle: " + String(angle2)); });
 
-    server.on("/servo/90", HTTP_GET, []() {
-        setServoAngle(90);
-        server.send(200, "text/html", "Servo at 90°");
-    });
-
-    server.on("/servo/180", HTTP_GET, []() {
-        setServoAngle(180);
-        server.send(200, "text/html", "Servo at 180°");
-    });
+    server.on("/servo2/decrease", HTTP_GET, []()
+              {
+        decreaseServo2Angle();
+        server.send(200, "text/html", "Servo 2 Angle: " + String(angle2)); });
 
     // 启动服务器
     server.begin();
@@ -257,6 +254,5 @@ void setup()
 void loop()
 {
     server.handleClient(); // 处理客户端请求
-    encoder(); // 不断读取编码器数据并在串口打印
 }
 

@@ -21,6 +21,11 @@
   },
   {
     "Sourcefile": "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\build\\sketch\\main.ino.cpp",
+    "Include": "ESP32Servo.h",
+    "Includepath": "C:\\Users\\xuyang\\Documents\\Arduino\\libraries\\ESP32Servo\\src"
+  },
+  {
+    "Sourcefile": "E:\\win_code_git\\alist_ACTIVITY\\RMsmartCar\\build\\sketch\\main.ino.cpp",
     "Include": "",
     "Includepath": null
   },
@@ -86,6 +91,16 @@
   },
   {
     "Sourcefile": "C:\\Users\\xuyang\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.16\\libraries\\WebServer\\src\\detail\\mimetable.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\xuyang\\Documents\\Arduino\\libraries\\ESP32Servo\\src\\ESP32PWM.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\xuyang\\Documents\\Arduino\\libraries\\ESP32Servo\\src\\ESP32Servo.cpp",
     "Include": "",
     "Includepath": null
   },
