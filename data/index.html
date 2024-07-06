@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ESP32 LED Control</title>
+  <style>
+    .button {
+      display: inline-block;
+      padding: 20px 30px;
+      margin: 20px;
+      font-size: 20px;
+      text-align: center;
+      text-decoration: none;
+      outline: none;
+      color: #fff;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 9px #999;
+    }
+    .button:hover {background-color: #3e8e41}
+    .button:active {
+      background-color: #3e8e41;
+      box-shadow: 0 5px #666;
+      transform: translateY(4px);
+    }
+    .container {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>ESP32 LED Control</h2>
+    <a class="button" href="/led/on">Turn On</a>
+    <a class="button" href="/led/off">Turn Off</a>
+    <a class="button" href="/forward">Forward</a>
+    <a class="button" href="/backward">Backward</a>
+    <!-- 这里可以添加更多功能按钮 -->
+    <a class="button" href="/full_forward">Full Speed Forward</a>
+    <a class="button" href="/full_backward">Full Speed Backward</a>
+  </div>
+</body>
+</html>
